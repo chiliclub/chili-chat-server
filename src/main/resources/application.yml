@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: chili-chat
+  profiles:
+    group:
+      default: local
+      local: local
+      dev: dev
+      prod: prod

@@ -1,8 +1,10 @@
 package com.chiliclub.chilichat.controller;
 
+import com.chiliclub.chilichat.dto.TestDto;
 import com.chiliclub.chilichat.entity.TestEntity;
 import com.chiliclub.chilichat.service.TestService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     private final TestService testService;
+    private final ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity<String> test() {
@@ -21,7 +24,9 @@ public class TestController {
     }
 
     @GetMapping("/query")
-    public ResponseEntity<TestEntity> query() {
-        return ResponseEntity.ok(testService.testQuery());
+    public ResponseEntity<TestDto> query() {
+        TestEntity entity = testService.testQuery();
+        TestDto dto = modelMapper.map(entity, TestDto.class);
+        return ResponseEntity.ok().body(dto);
     }
 }

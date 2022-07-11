@@ -1,5 +1,6 @@
 package com.chiliclub.chilichat.controller;
 
+import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.dto.TestDto;
 import com.chiliclub.chilichat.entity.TestEntity;
 import com.chiliclub.chilichat.service.TestService;
@@ -28,5 +29,18 @@ public class TestController {
         TestEntity entity = testService.testQuery();
         TestDto dto = modelMapper.map(entity, TestDto.class);
         return ResponseEntity.ok().body(dto);
+    }
+
+    @GetMapping("/error/server")
+    public ResponseEntity<TestDto> serverError() {
+        TestEntity entity = testService.testQuery();
+        TestDto dto = modelMapper.map(entity, TestDto.class);
+        throw new RuntimeException();
+    }
+    @GetMapping("/error/client")
+    public ResponseEntity<TestDto> clientError() {
+        TestEntity entity = testService.testQuery();
+        TestDto dto = modelMapper.map(entity, TestDto.class);
+        throw new ResourceNotFoundException();
     }
 }

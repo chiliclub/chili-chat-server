@@ -4,7 +4,7 @@ import com.chiliclub.chilichat.common.enumeration.ErrorCode;
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
 import com.chiliclub.chilichat.common.exception.MethodNotAllowedException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
-import com.chiliclub.chilichat.dto.ErrorResponse;
+import com.chiliclub.chilichat.model.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;

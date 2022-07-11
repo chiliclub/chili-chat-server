@@ -1,7 +1,7 @@
 package com.chiliclub.chilichat.controller;
 
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
-import com.chiliclub.chilichat.dto.TestDto;
+import com.chiliclub.chilichat.model.TestDto;
 import com.chiliclub.chilichat.entity.TestEntity;
 import com.chiliclub.chilichat.service.TestService;
 import lombok.RequiredArgsConstructor;

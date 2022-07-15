@@ -1,8 +1,11 @@
 package com.chiliclub.chilichat.entity;
 
+import com.chiliclub.chilichat.model.UserRegisterRequest;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,13 +23,12 @@ public class UserEntity extends BaseEntity {
     private Long no;
 
     @NotNull
-    @Size(min = 1, max = 30)
+    @Size(min = 5, max = 30)
     @Column(name = "id", unique = true, length = 30)
     private String loginId;
 
     @NotNull
-    @Size(min = 1, max = 30)
-    @Column(name = "pwd", length = 30)
+    @Column(name = "pwd")
     private String password;
 
     @NotNull
@@ -35,4 +37,24 @@ public class UserEntity extends BaseEntity {
     private String nickname;
 
     private String picUrl;
+
+    @Builder
+    public UserEntity(String loginId, String password, String nickname) {
+        this.loginId = loginId;
+        this.password = password;
+        this.nickname = nickname;
+    }
+
+    public void updatePicUrl(String picUrl) {
+        this.picUrl = picUrl;
+    }
+
+    public static UserEntity create(UserRegisterRequest req, PasswordEncoder passwordEncoder) {
+
+        return UserEntity.builder()
+                .loginId(req.getId())
+                .password(passwordEncoder.encode(req.getPassword()))
+                .nickname(req.getNickname())
+                .build();
+    }
 }

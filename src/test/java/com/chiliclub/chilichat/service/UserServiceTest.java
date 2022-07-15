@@ -32,7 +32,7 @@ class UserServiceTest {
     private UserRegisterRequest createAddUserRequest() {
         return UserRegisterRequest.builder()
                 .id("tester1")
-                .password("#test1234")
+                .password("test1234")
                 .nickname("무키무키")
                 .build();
     }
@@ -70,7 +70,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("아이디 중복으로 유저를 저장하는 데 실패한다")
-    void testFailToSaveUserIfLoginIdIsDuplicated() {
+    void testFailToSaveUserIfIdIsDuplicated() {
 
         // given
         UserRegisterRequest req = createAddUserRequest();

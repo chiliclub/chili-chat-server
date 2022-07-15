@@ -23,7 +23,7 @@ public class UserEntity extends BaseEntity {
     private Long no;
 
     @NotNull
-    @Size(min = 1, max = 30)
+    @Size(min = 5, max = 30)
     @Column(name = "id", unique = true, length = 30)
     private String loginId;
 

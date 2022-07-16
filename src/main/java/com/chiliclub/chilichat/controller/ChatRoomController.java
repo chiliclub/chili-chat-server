@@ -2,6 +2,8 @@ package com.chiliclub.chilichat.controller;
 
 import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
 import com.chiliclub.chilichat.model.ChatRoomFindResponse;
+import com.chiliclub.chilichat.model.ChatRoomUpdateRequest;
+import com.chiliclub.chilichat.model.ChatRoomUpdateResponse;
 import com.chiliclub.chilichat.service.ChatRoomService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +43,17 @@ public class ChatRoomController {
         chatRoomService.removeChatRoom(chatRoomNo);
 
         return ResponseEntity.ok(true);
+    }
+
+    @ApiOperation(value = "채팅방 정보 수정")
+    @PutMapping("/{chatRoomNo}")
+    public ResponseEntity<ChatRoomUpdateResponse> chatRoomModify(
+            @PathVariable Long chatRoomNo,
+            @RequestBody ChatRoomUpdateRequest chatRoomUpdateRequest
+            ) {
+
+        ChatRoomUpdateResponse chatRoomUpdateResponse = chatRoomService.modifyChatRoom(chatRoomNo, chatRoomUpdateRequest);
+
+        return ResponseEntity.ok(chatRoomUpdateResponse);
     }
 }

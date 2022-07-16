@@ -1,6 +1,7 @@
 package com.chiliclub.chilichat.entity;
 
 import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
+import com.chiliclub.chilichat.model.ChatRoomUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,5 +35,9 @@ public class ChatRoomEntity extends BaseEntity {
         return ChatRoomEntity.builder()
                 .title(req.getTitle())
                 .build();
+    }
+
+    public void update(ChatRoomUpdateRequest req) {
+        this.title = req.getTitle();
     }
 }

@@ -38,7 +38,7 @@ public class ChatRoomService {
 
     public ChatRoomUpdateResponse modifyChatRoom(Long chatRoomNo, ChatRoomUpdateRequest chatRoomUpdateRequest) {
         ChatRoomEntity chatroomToModify = chatRoomRepository.findById(chatRoomNo)
-                .orElseThrow(() -> new ResourceNotFoundException(String.valueOf(ErrorCode.RESOURCE_NOT_FOUND)));
+                .orElseThrow(ResourceNotFoundException::new);
 
         chatroomToModify.update(chatRoomUpdateRequest);
 

@@ -26,4 +26,8 @@ public class ChatRoomService {
         return chatRoomRepository.findAll().stream()
                 .map(ChatRoomFindResponse::of).collect(Collectors.toList());
     }
+
+    public void removeChatRoom(Long chatRoomNo) {
+        chatRoomRepository.deleteById(chatRoomNo);
+    }
 }

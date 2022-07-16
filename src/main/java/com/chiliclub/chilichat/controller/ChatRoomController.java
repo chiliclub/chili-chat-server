@@ -34,4 +34,12 @@ public class ChatRoomController {
     public ResponseEntity<List<ChatRoomFindResponse>> chatRoomList() {
         return ResponseEntity.ok(chatRoomService.findChatRoomList());
     }
+
+    @ApiOperation(value = "채팅방 삭제")
+    @DeleteMapping("/{chatRoomNo}")
+    public ResponseEntity<Boolean> chatRoomRemove(@PathVariable Long chatRoomNo) {
+        chatRoomService.removeChatRoom(chatRoomNo);
+
+        return ResponseEntity.ok(true);
+    }
 }

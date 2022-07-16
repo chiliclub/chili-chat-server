@@ -19,8 +19,8 @@ public class ChatRoomUpdateRequest {
             example = "파이썬 1:1 초보만!"
     )
     @Pattern(
-            regexp = "[^?a-zA-Z\\d/]{1,30}"
+            regexp = "[^?a-zA-Z\\d/]{1,30}",
+            message = "채팅방 이름은 1~30자 이내"
     )
-    @Size(min = 1, max = 30, message = "채팅방 이름은 1~30자 이내")
     private String title;
 }

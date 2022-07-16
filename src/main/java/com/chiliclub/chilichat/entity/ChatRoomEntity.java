@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,8 +23,11 @@ public class ChatRoomEntity extends BaseEntity {
     @Column(name = "chat_room_no")
     private Long no;
 
+    @Pattern(
+            regexp = "[^?a-zA-Z\\d/]{1,30}"
+    )
     @NotNull
-    @Size(min = 1, max = 20)
+    @Size(min = 1, max = 30)
     private String title;
 
     @Builder

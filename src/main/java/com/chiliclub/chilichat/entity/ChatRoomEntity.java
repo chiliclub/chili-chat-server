@@ -1,6 +1,8 @@
 package com.chiliclub.chilichat.entity;
 
+import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +24,15 @@ public class ChatRoomEntity extends BaseEntity {
     @NotNull
     @Size(min = 1, max = 20)
     private String title;
+
+    @Builder
+    public ChatRoomEntity(String title) {
+        this.title = title;
+    }
+
+    public static ChatRoomEntity create(ChatRoomCreateRequest req) {
+        return ChatRoomEntity.builder()
+                .title(req.getTitle())
+                .build();
+    }
 }

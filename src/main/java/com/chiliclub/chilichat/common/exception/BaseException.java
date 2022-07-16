@@ -11,5 +11,14 @@ import lombok.Getter;
 public class BaseException extends RuntimeException {
 
     private ErrorCode errorCode;
-    private String message;
+
+    public BaseException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+
+    public BaseException(ErrorCode errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
 }

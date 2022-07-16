@@ -1,4 +1,4 @@
-package com.chiliclub.chilichat.model;
+package com.chiliclub.chilichat.model.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @Getter
 @NoArgsConstructor
 @ApiModel
-public class UserRegisterRequest {
+public class UserSaveRequest {
 
     @ApiModelProperty(
             required = true,
@@ -25,6 +25,7 @@ public class UserRegisterRequest {
             message = "아이디는 영문자를 포함한 5-30자리 이내"
     )
     private String id;
+
     @ApiModelProperty(
             required = true,
             value = "비밀번호",
@@ -35,6 +36,7 @@ public class UserRegisterRequest {
             message = "비밀번호는 영문자와 숫자를 포함한 8-30자리 이내"
     )
     private String password;
+
     @ApiModelProperty(
             required = true,
             value = "닉네임",
@@ -45,7 +47,7 @@ public class UserRegisterRequest {
     private String nickname;
 
     @Builder
-    public UserRegisterRequest(String id, String password, String nickname) {
+    public UserSaveRequest(String id, String password, String nickname) {
         this.id = id;
         this.password = password;
         this.nickname = nickname;

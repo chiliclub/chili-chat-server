@@ -1,5 +1,6 @@
 package com.chiliclub.chilichat.model;
 
+import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UserRegisterRequestTest {
+class UserSaveRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -19,14 +20,14 @@ class UserRegisterRequestTest {
     void tesSuccessToValidateId() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(0);
@@ -37,14 +38,14 @@ class UserRegisterRequestTest {
     void testFailToValidateIdIfIsAlphabetIsNotIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("111111")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -56,14 +57,14 @@ class UserRegisterRequestTest {
     void testFailToValidateIdIfSpecialCharacterIsIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1!")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -75,14 +76,14 @@ class UserRegisterRequestTest {
     void testFailToValidateIdIfBlankIsIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tesadsfadf ter1")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -94,14 +95,14 @@ class UserRegisterRequestTest {
     void testFailToValidateIdIfLengthIsLessThan5() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("test!")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -113,14 +114,14 @@ class UserRegisterRequestTest {
     void testFailToValidateIdIfLengthIsMoreThan30() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("TestTestTestTestTestTestTestTest")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -132,14 +133,14 @@ class UserRegisterRequestTest {
     void testFailToValidatePasswordIfAlphabetIsNotIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("12341234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -151,14 +152,14 @@ class UserRegisterRequestTest {
     void testFailToValidatePasswordIfNumberIsNotIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("testtest")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -170,14 +171,14 @@ class UserRegisterRequestTest {
     void testFailToValidatePasswordIfSpecialCharacterIsIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234!")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -189,14 +190,14 @@ class UserRegisterRequestTest {
     void testFailToValidatePasswordIfBlankIsIncluded() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234 test1234")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -208,14 +209,14 @@ class UserRegisterRequestTest {
     void testFailToValidatePasswordIfLengthIsLessThan8() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test123")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -227,14 +228,14 @@ class UserRegisterRequestTest {
     void testFailToValidatePasswordIfLengthIsMoreThan30() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("TestTestTestTestTestTestTestTest")
                 .nickname("무키무키")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -246,14 +247,14 @@ class UserRegisterRequestTest {
     void testFailToValidateNicknameIfOnlyComposedOfBlank() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234")
                 .nickname("   ")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -265,14 +266,14 @@ class UserRegisterRequestTest {
     void testFailToValidateNicknameIfLengthIsLessThan2() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234")
                 .nickname("욱")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -284,14 +285,14 @@ class UserRegisterRequestTest {
     void testFailToValidateNicknameIfLengthIsMoreThan10() {
 
         // given
-        UserRegisterRequest req = UserRegisterRequest.builder()
+        UserSaveRequest req = UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234")
                 .nickname("배고파요밥주세요엉엉엉엉")
                 .build();
 
         // when
-        Set<ConstraintViolation<UserRegisterRequest>> violations = validator.validate(req);
+        Set<ConstraintViolation<UserSaveRequest>> violations = validator.validate(req);
 
         // then
         assertThat(violations.size()).isEqualTo(1);

@@ -1,6 +1,6 @@
 package com.chiliclub.chilichat.entity;
 
-import com.chiliclub.chilichat.model.UserRegisterRequest;
+import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class UserEntity extends BaseEntity {
         this.picUrl = picUrl;
     }
 
-    public static UserEntity create(UserRegisterRequest req, PasswordEncoder passwordEncoder) {
+    public static UserEntity create(UserSaveRequest req, PasswordEncoder passwordEncoder) {
 
         return UserEntity.builder()
                 .loginId(req.getId())

@@ -18,7 +18,7 @@ public class ChatRoomUpdateResponse {
         this.id = id;
     }
 
-    public static ChatRoomUpdateResponse of(ChatRoomEntity chatRoom) {
+    public static ChatRoomUpdateResponse from(ChatRoomEntity chatRoom) {
         return ChatRoomUpdateResponse.builder()
                 .id(chatRoom.getNo())
                 .build();

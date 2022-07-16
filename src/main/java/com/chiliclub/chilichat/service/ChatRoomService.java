@@ -29,7 +29,7 @@ public class ChatRoomService {
 
     public List<ChatRoomFindResponse> findChatRoomList() {
         return chatRoomRepository.findAll().stream()
-                .map(ChatRoomFindResponse::of).collect(Collectors.toList());
+                .map(ChatRoomFindResponse::from).collect(Collectors.toList());
     }
 
     public void removeChatRoom(Long chatRoomNo) {
@@ -42,6 +42,6 @@ public class ChatRoomService {
 
         chatroomToModify.update(chatRoomUpdateRequest);
 
-        return ChatRoomUpdateResponse.of(chatroomToModify);
+        return ChatRoomUpdateResponse.from(chatroomToModify);
     }
 }

@@ -26,7 +26,7 @@ public class ChatRoomFindResponse {
         this.upDatetime = upDatetime;
     }
 
-    public static ChatRoomFindResponse of(ChatRoomEntity chatRoom) {
+    public static ChatRoomFindResponse from(ChatRoomEntity chatRoom) {
         return ChatRoomFindResponse.builder()
                 .title(chatRoom.getTitle())
                 .insDatetime(chatRoom.getInsDatetime())

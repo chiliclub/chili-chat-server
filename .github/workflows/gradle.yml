@@ -1,33 +1,25 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: SERVER distribute
 
 on:
   push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
-
-permissions:
-  contents: read
+    branches: [ dev ]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
-    - name: pull lateset version
-      run: git pull origin dev
-      
-    - name: Build with Gradle
-      run: ./gradlew build
-      
-    - name: Start jar file
-      run: sudo java -jar build/libs/chilichat-0.0.1-SNAPSHOT.jar
-    
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_IP }}
+          username: ${{ secrets.REMOTE_SSH_ID }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+            cd chili-chat-server
+            sudo git pull
+            sudo rm -r build/
+            sudo ./gradlew build
+            sudo java -jar build/libs/chilichat-0.0.1-SNAPSHOT.jar
+            

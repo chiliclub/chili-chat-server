@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @NoArgsConstructor
 @ApiModel
@@ -15,6 +17,7 @@ public class UserSignInRequest {
             value = "아이디",
             example = "tester1"
     )
+    @NotBlank
     private String id;
 
     @ApiModelProperty(
@@ -23,5 +26,6 @@ public class UserSignInRequest {
             value = "비밀번호",
             example = "test1234"
     )
+    @NotBlank
     private String password;
 }

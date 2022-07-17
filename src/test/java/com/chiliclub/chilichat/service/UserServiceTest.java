@@ -14,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,9 +59,9 @@ class UserServiceTest {
         UserEntity userEntity = createUserEntity(req);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(null);
+                .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
-                .willReturn(null);
+                .willReturn(Optional.empty());
         given(userRepository.save(any(UserEntity.class)))
                 .willReturn(userEntity);
 
@@ -79,7 +81,7 @@ class UserServiceTest {
         UserEntity userEntity = createUserEntity(req);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(userEntity);
+                .willReturn(Optional.ofNullable(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))
@@ -96,9 +98,9 @@ class UserServiceTest {
         UserEntity userEntity = createUserEntity(req);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(null);
+                .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
-                .willReturn(userEntity);
+                .willReturn(Optional.ofNullable(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))

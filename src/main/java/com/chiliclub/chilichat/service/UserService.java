@@ -34,13 +34,11 @@ public class UserService {
 
     private void validateDuplicatedUser(UserSaveRequest req) {
 
-        UserEntity foundUserById = userRepository.findByLoginId(req.getId());
-        if (foundUserById != null) {
+        if (userRepository.findByLoginId(req.getId()).isPresent()) {
             throw new InvalidReqParamException("중복된 아이디입니다.");
         }
 
-        UserEntity foundUserByNickname = userRepository.findByNickname(req.getNickname());
-        if (foundUserByNickname != null) {
+        if (userRepository.findByNickname(req.getNickname()).isPresent()) {
             throw new InvalidReqParamException("중복된 닉네임입니다.");
         }
     }

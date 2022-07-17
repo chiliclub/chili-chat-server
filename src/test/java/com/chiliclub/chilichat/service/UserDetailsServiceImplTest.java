@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -36,7 +38,7 @@ class UserDetailsServiceImplTest {
         given(mockUserEntity.getPassword()).willReturn("mockPassword");
         given(mockUserEntity.getNickname()).willReturn("무키무키");
 
-        given(userRepository.findByLoginId(loginId)).willReturn(mockUserEntity);
+        given(userRepository.findByLoginId(loginId)).willReturn(Optional.of(mockUserEntity));
 
         // when
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetailsService.loadUserByUsername(loginId);
@@ -54,7 +56,7 @@ class UserDetailsServiceImplTest {
         // given
         String loginId = "tester1";
 
-        given(userRepository.findByLoginId(loginId)).willReturn(null);
+        given(userRepository.findByLoginId(loginId)).willReturn(Optional.empty());
 
         // when && then
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername(loginId))

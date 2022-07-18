@@ -1,6 +1,8 @@
 package com.chiliclub.chilichat.controller;
 
-import com.chiliclub.chilichat.model.UserRegisterRequest;
+import com.chiliclub.chilichat.model.user.UserSaveRequest;
+import com.chiliclub.chilichat.model.user.UserSignInRequest;
+import com.chiliclub.chilichat.model.user.UserSignInResponse;
 import com.chiliclub.chilichat.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/user")
@@ -21,9 +25,13 @@ public class UserController {
 
     @ApiOperation(value = "회원 등록")
     @PostMapping("/signup")
-    public ResponseEntity<Long> userRegister(@RequestBody UserRegisterRequest req) {
+    public ResponseEntity<Long> userSave(@RequestBody UserSaveRequest req) {
+        return ResponseEntity.ok(userService.saveUser(req));
+    }
 
-        Long userNo = userService.saveUser(req);
-        return ResponseEntity.ok(userNo);
+    @ApiOperation(value = "로그인")
+    @PostMapping("/signin")
+    public ResponseEntity<UserSignInResponse> userSignIn(@RequestBody UserSignInRequest req, HttpServletResponse res) {
+        return ResponseEntity.ok(userService.signIn(req.getId(), req.getPassword()));
     }
 }

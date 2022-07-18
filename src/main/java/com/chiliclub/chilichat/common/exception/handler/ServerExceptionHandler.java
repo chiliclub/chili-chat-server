@@ -8,16 +8,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import static com.chiliclub.chilichat.common.utils.StringUtils.handleMessage;
+
 @Slf4j
 @RestControllerAdvice(basePackages = "com.chiliclub.chilichat.controller")
 public class ServerExceptionHandler {
-
-    private String handleMessage(String message, ErrorCode errorCode) {
-        StringBuilder stringBuilder = new StringBuilder("Server Error: ");
-        if (message == null) stringBuilder.append(errorCode.getName());
-        else stringBuilder.append(message);
-        return stringBuilder.toString();
-    }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

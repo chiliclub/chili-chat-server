@@ -2,7 +2,7 @@ package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
 import com.chiliclub.chilichat.entity.UserEntity;
-import com.chiliclub.chilichat.model.UserRegisterRequest;
+import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import com.chiliclub.chilichat.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -29,19 +32,20 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private UserRegisterRequest createAddUserRequest() {
-        return UserRegisterRequest.builder()
+    private UserSaveRequest createAddUserRequest() {
+        return UserSaveRequest.builder()
                 .id("tester1")
                 .password("test1234")
                 .nickname("무키무키")
                 .build();
     }
 
-    private UserEntity createUserEntity(UserRegisterRequest req) {
+    private UserEntity createUserEntity(UserSaveRequest req) {
 
         UserEntity userEntity = UserEntity.create(req, passwordEncoder);
         Long userEntityNo = 1L;
         ReflectionTestUtils.setField(userEntity, "no", userEntityNo);
+
         return userEntity;
     }
 
@@ -51,13 +55,13 @@ class UserServiceTest {
     void testSuccessToSaveUser() {
 
         // given
-        UserRegisterRequest req = createAddUserRequest();
+        UserSaveRequest req = createAddUserRequest();
         UserEntity userEntity = createUserEntity(req);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(null);
+                .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
-                .willReturn(null);
+                .willReturn(Optional.empty());
         given(userRepository.save(any(UserEntity.class)))
                 .willReturn(userEntity);
 
@@ -73,11 +77,11 @@ class UserServiceTest {
     void testFailToSaveUserIfIdIsDuplicated() {
 
         // given
-        UserRegisterRequest req = createAddUserRequest();
+        UserSaveRequest req = createAddUserRequest();
         UserEntity userEntity = createUserEntity(req);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(userEntity);
+                .willReturn(Optional.ofNullable(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))
@@ -90,13 +94,13 @@ class UserServiceTest {
     void testFailToSaveUserIfNicknameIsDuplicated() {
 
         // given
-        UserRegisterRequest req = createAddUserRequest();
+        UserSaveRequest req = createAddUserRequest();
         UserEntity userEntity = createUserEntity(req);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(null);
+                .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
-                .willReturn(userEntity);
+                .willReturn(Optional.ofNullable(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))

@@ -2,8 +2,9 @@ package com.chiliclub.chilichat.common.exception.handler;
 
 import com.chiliclub.chilichat.common.enumeration.ErrorCode;
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
-import com.chiliclub.chilichat.common.exception.MethodNotAllowedException;
+import com.chiliclub.chilichat.common.exception.RequestForbiddenException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
+import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
 import com.chiliclub.chilichat.model.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -17,16 +18,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.nio.file.AccessDeniedException;
 
+import static com.chiliclub.chilichat.common.utils.StringUtils.handleMessage;
+
 @Slf4j
 @RestControllerAdvice(basePackages = "com.chiliclub.chilichat.controller")
 public class ClientExceptionHandler {
-
-    private String handleMessage(String message, ErrorCode errorCode) {
-        StringBuilder stringBuilder = new StringBuilder("Client Error: ");
-        if (message == null) stringBuilder.append(errorCode.getName());
-        else stringBuilder.append(message);
-        return stringBuilder.toString();
-    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -83,15 +79,15 @@ public class ClientExceptionHandler {
     public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
         log.error("AccessDeniedException", e);
         return new ErrorResponse(
-                ErrorCode.METHOD_NOT_ALLOWED.getName(),
-                handleMessage(e.getMessage(), ErrorCode.METHOD_NOT_ALLOWED)
+                ErrorCode.USER_NOT_AUTHORIZED.getName(),
+                handleMessage(e.getMessage(), ErrorCode.USER_NOT_AUTHORIZED)
         );
     }
 
-    @ExceptionHandler(MethodNotAllowedException.class)
+    @ExceptionHandler(UserNotAuthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleMethodNotAllowedException(MethodNotAllowedException e) {
-        log.error("MethodNotAllowedException", e);
+    public ErrorResponse handleMethodNotAllowedException(UserNotAuthorizedException e) {
+        log.error("UserNotAuthorizedException", e);
         return new ErrorResponse(
                 e.getErrorCode().getName(),
                 handleMessage(e.getMessage(), e.getErrorCode())
@@ -102,6 +98,15 @@ public class ClientExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e) {
         log.error("ResourceNotFoundException", e);
+        return new ErrorResponse(
+                e.getErrorCode().getName(),
+                handleMessage(e.getMessage(), e.getErrorCode())
+        );
+    }
+    @ExceptionHandler(RequestForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleRequestForbiddenException(RequestForbiddenException e) {
+        log.error("RequestForbiddenException", e);
         return new ErrorResponse(
                 e.getErrorCode().getName(),
                 handleMessage(e.getMessage(), e.getErrorCode())

@@ -20,4 +20,10 @@ public class UserSignInResponse {
     public UserSignInResponse(String token) {
         this.token = token;
     }
+
+    public static UserSignInResponse from(String token) {
+        return UserSignInResponse.builder()
+                .token(token)
+                .build();
+    }
 }

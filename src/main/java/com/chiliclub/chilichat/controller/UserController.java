@@ -26,20 +26,12 @@ public class UserController {
     @ApiOperation(value = "회원 등록")
     @PostMapping("/signup")
     public ResponseEntity<Long> userSave(@RequestBody UserSaveRequest req) {
-
-        Long userNo = userService.saveUser(req);
-        return ResponseEntity.ok(userNo);
+        return ResponseEntity.ok(userService.saveUser(req));
     }
 
     @ApiOperation(value = "로그인")
     @PostMapping("/signin")
     public ResponseEntity<UserSignInResponse> userSignIn(@RequestBody UserSignInRequest req, HttpServletResponse res) {
-
-        String token = userService.signIn(req.getId(), req.getPassword());
-
-        return ResponseEntity.ok(UserSignInResponse.builder()
-                .token(token)
-                .build()
-        );
+        return ResponseEntity.ok(userService.signIn(req.getId(), req.getPassword()));
     }
 }

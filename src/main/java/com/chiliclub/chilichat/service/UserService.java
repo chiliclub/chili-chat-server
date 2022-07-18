@@ -6,6 +6,7 @@ import com.chiliclub.chilichat.config.auth.TokenProvider;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserDetailsImpl;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
+import com.chiliclub.chilichat.model.user.UserSignInResponse;
 import com.chiliclub.chilichat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class UserService {
         }
     }
 
-    public String signIn(String id, String password) {
+    public UserSignInResponse signIn(String id, String password) {
 
         final Authentication authentication;
         try {
@@ -56,7 +57,9 @@ public class UserService {
             throw new UserNotAuthorizedException();
         }
 
-        return createJwtToken(authentication);
+        String token = createJwtToken(authentication);
+
+        return UserSignInResponse.from(token);
     }
 
     private String createJwtToken(Authentication authentication) {

@@ -1,7 +1,8 @@
 package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
-import com.chiliclub.chilichat.config.TokenProvider;
+import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
+import com.chiliclub.chilichat.config.auth.TokenProvider;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserDetailsImpl;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
@@ -9,6 +10,7 @@ import com.chiliclub.chilichat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,9 +47,14 @@ public class UserService {
 
     public String signIn(String id, String password) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(id, password)
-        );
+        final Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(id, password)
+            );
+        } catch (BadCredentialsException e) {
+            throw new UserNotAuthorizedException();
+        }
 
         return createJwtToken(authentication);
     }

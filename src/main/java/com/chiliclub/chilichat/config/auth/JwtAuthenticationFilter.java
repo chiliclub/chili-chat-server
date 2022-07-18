@@ -1,6 +1,6 @@
-package com.chiliclub.chilichat.common.filter;
+package com.chiliclub.chilichat.config.auth;
 
-import com.chiliclub.chilichat.config.TokenProvider;
+import com.chiliclub.chilichat.common.exception.RequestForbiddenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -31,6 +31,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             if (tokenProvider.validateToken(jwtToken)) {
                 Authentication authentication = tokenProvider.getAuthentication(jwtToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                throw new RequestForbiddenException();
             }
         } else {
             log.warn("토큰이 존재하지 않습니다.");

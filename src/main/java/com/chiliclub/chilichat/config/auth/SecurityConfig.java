@@ -1,6 +1,6 @@
-package com.chiliclub.chilichat.config;
+package com.chiliclub.chilichat.config.auth;
 
-import com.chiliclub.chilichat.common.filter.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,14 +15,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
+import static com.chiliclub.chilichat.common.enumeration.Consts.WHITE_LIST;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
     private final TokenProvider tokenProvider;
+    private final ObjectMapper objectMapper;
 
-    private static final String[] AUTH_IGNORED_LIST = {
+    private static final String[] STATIC_RESOURCE_LIST = {
             "/v2/api-docs",
             "/v3/api-docs/**",
             "/configuration/ui",
@@ -37,6 +40,7 @@ public class SecurityConfig {
             "/"
     };
 
+    // TODO: test 관련 코드 지울 것
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -47,16 +51,17 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/user/signup", "/user/signin").permitAll()
+                .antMatchers(WHITE_LIST).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtExceptionFilter(objectMapper), JwtAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().antMatchers(AUTH_IGNORED_LIST);
+        return web -> web.ignoring().antMatchers(STATIC_RESOURCE_LIST).antMatchers();
     }
 
     @Bean
@@ -67,5 +72,15 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(TokenProvider tokenProvider) {
+        return new JwtAuthenticationFilter(tokenProvider);
+    }
+
+    @Bean
+    public JwtExceptionFilter jwtExceptionFilter(ObjectMapper objectMapper) {
+        return new JwtExceptionFilter(objectMapper);
     }
 }

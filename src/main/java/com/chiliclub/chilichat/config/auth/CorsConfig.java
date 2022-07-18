@@ -1,4 +1,4 @@
-package com.chiliclub.chilichat.config;
+package com.chiliclub.chilichat.config.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

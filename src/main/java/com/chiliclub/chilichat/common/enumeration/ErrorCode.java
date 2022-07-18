@@ -9,7 +9,9 @@ public enum ErrorCode {
     // 400
     INVALID_REQUEST_PARAMETER("Invalid Request Parameter"),
     // 401
-    METHOD_NOT_ALLOWED("Method Not Allowed"),
+    USER_NOT_AUTHORIZED("User Not Authorized"),
+    //403
+    REQUEST_FORBIDDEN("Request Forbidden"),
     // 404
     RESOURCE_NOT_FOUND("Resource Not Found"),
 

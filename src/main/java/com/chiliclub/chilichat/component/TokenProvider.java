@@ -1,4 +1,4 @@
-package com.chiliclub.chilichat.config.auth;
+package com.chiliclub.chilichat.component;
 
 
 import com.chiliclub.chilichat.model.user.UserDetailsImpl;

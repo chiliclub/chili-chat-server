@@ -2,7 +2,7 @@ package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
 import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
-import com.chiliclub.chilichat.config.auth.TokenProvider;
+import com.chiliclub.chilichat.component.TokenProvider;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserDetailsImpl;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;

@@ -30,5 +30,4 @@ public class MessageEntity {
 
     private LocalDateTime insDatetime;
 
-
 }

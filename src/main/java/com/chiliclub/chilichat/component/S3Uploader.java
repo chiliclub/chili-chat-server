@@ -30,8 +30,8 @@ public class S3Uploader {
     public String upload(MultipartFile file) throws IOException {
 
         String fileName = dir + '/'
-                + file.getOriginalFilename()
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+                + file.getOriginalFilename();
 
         byte[] bytes = IOUtils.toByteArray(file.getInputStream());
 

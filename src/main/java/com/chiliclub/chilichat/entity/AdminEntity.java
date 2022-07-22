@@ -1,6 +1,7 @@
 package com.chiliclub.chilichat.entity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,10 @@ public class AdminEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_no")
     private ChatRoomEntity chatRoom;
+
+    @Builder
+    public AdminEntity(UserEntity user, ChatRoomEntity chatRoom) {
+        this.user = user;
+        this.chatRoom = chatRoom;
+    }
 }

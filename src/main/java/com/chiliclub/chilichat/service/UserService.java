@@ -1,6 +1,7 @@
 package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
+import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
 import com.chiliclub.chilichat.component.TokenProvider;
 import com.chiliclub.chilichat.entity.UserEntity;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -67,5 +69,16 @@ public class UserService {
         UserDetailsImpl principal = (UserDetailsImpl) authentication.getPrincipal();
 
         return tokenProvider.generateToken(principal);
+    }
+
+    public Long getCurrentUserNo() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl principal = (UserDetailsImpl) authentication.getPrincipal();
+
+        UserEntity userEntity = userRepository.findByLoginId(principal.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("현재 인증된 유저가 존재하지 않습니다"));
+
+        return userEntity.getNo();
     }
 }

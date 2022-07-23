@@ -1,6 +1,7 @@
 package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
+import com.chiliclub.chilichat.component.S3Uploader;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import com.chiliclub.chilichat.repository.UserRepository;
@@ -29,6 +30,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Spy
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private S3Uploader s3Uploader;
     @InjectMocks
     private UserService userService;
 
@@ -40,9 +43,16 @@ class UserServiceTest {
                 .build();
     }
 
-    private UserEntity createUserEntity(UserSaveRequest req) {
+    private UserEntity createUserEntity(
+            UserSaveRequest req,
+            String defaultPicUrl
+    ) {
 
-        UserEntity userEntity = UserEntity.create(req, passwordEncoder);
+        UserEntity userEntity = UserEntity.create(
+                req,
+                passwordEncoder,
+                defaultPicUrl);
+
         Long userEntityNo = 1L;
         ReflectionTestUtils.setField(userEntity, "no", userEntityNo);
 
@@ -56,12 +66,15 @@ class UserServiceTest {
 
         // given
         UserSaveRequest req = createAddUserRequest();
-        UserEntity userEntity = createUserEntity(req);
+        String defaultPicUrl = "https://test/img.png";
+        UserEntity userEntity = createUserEntity(req, defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
                 .willReturn(Optional.empty());
+        given(s3Uploader.getDefaultPicUrl())
+                .willReturn(defaultPicUrl);
         given(userRepository.save(any(UserEntity.class)))
                 .willReturn(userEntity);
 
@@ -78,7 +91,8 @@ class UserServiceTest {
 
         // given
         UserSaveRequest req = createAddUserRequest();
-        UserEntity userEntity = createUserEntity(req);
+        String defaultPicUrl = "https://test/img.png";
+        UserEntity userEntity = createUserEntity(req, defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.ofNullable(userEntity));
@@ -95,7 +109,8 @@ class UserServiceTest {
 
         // given
         UserSaveRequest req = createAddUserRequest();
-        UserEntity userEntity = createUserEntity(req);
+        String defaultPicUrl = "https://test/img.png";
+        UserEntity userEntity = createUserEntity(req, defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.empty());

@@ -23,9 +23,12 @@ public class S3Uploader {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
-
     @Value("${cloud.aws.s3.dir}")
     public String dir;
+    @Value("${cloud.aws.s3.host}")
+    public String host;
+    @Value("${cloud.aws.s3.default-pic-name}")
+    public String defaultPicName;
 
     public String upload(MultipartFile file) throws IOException {
 
@@ -49,5 +52,9 @@ public class S3Uploader {
                 ));
 
         return amazonS3Client.getUrl(bucket, fileName).toString();
+    }
+
+    public String getDefaultPicUrl() {
+        return host + "/" + dir + "/" + defaultPicName;
     }
 }

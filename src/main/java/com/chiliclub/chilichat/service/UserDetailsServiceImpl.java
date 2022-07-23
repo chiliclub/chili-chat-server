@@ -25,6 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
 
         return UserDetailsImpl.builder()
+                .userNo(userEntity.getNo())
                 .username(userEntity.getLoginId())
                 .password(userEntity.getPassword())
                 .nickname(userEntity.getNickname())

@@ -1,8 +1,10 @@
 package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
+import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.component.S3Uploader;
 import com.chiliclub.chilichat.entity.UserEntity;
+import com.chiliclub.chilichat.model.user.UserInfoResponse;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import com.chiliclub.chilichat.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +48,7 @@ class UserServiceTest {
 
     private UserEntity createUserEntity(
             UserSaveRequest req,
+            Long userEntityNo,
             String defaultPicUrl
     ) {
 
@@ -53,7 +57,6 @@ class UserServiceTest {
                 passwordEncoder,
                 defaultPicUrl);
 
-        Long userEntityNo = 1L;
         ReflectionTestUtils.setField(userEntity, "no", userEntityNo);
 
         return userEntity;
@@ -66,8 +69,13 @@ class UserServiceTest {
 
         // given
         UserSaveRequest req = createAddUserRequest();
+        Long userEntityNo = 1L;
         String defaultPicUrl = "https://test/img.png";
-        UserEntity userEntity = createUserEntity(req, defaultPicUrl);
+
+        UserEntity userEntity = createUserEntity(
+                req,
+                userEntityNo,
+                defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.empty());
@@ -91,8 +99,13 @@ class UserServiceTest {
 
         // given
         UserSaveRequest req = createAddUserRequest();
+        Long userEntityNo = 1L;
         String defaultPicUrl = "https://test/img.png";
-        UserEntity userEntity = createUserEntity(req, defaultPicUrl);
+
+        UserEntity userEntity = createUserEntity(
+                req,
+                userEntityNo,
+                defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.ofNullable(userEntity));
@@ -109,8 +122,13 @@ class UserServiceTest {
 
         // given
         UserSaveRequest req = createAddUserRequest();
+        Long userEntityNo = 1L;
         String defaultPicUrl = "https://test/img.png";
-        UserEntity userEntity = createUserEntity(req, defaultPicUrl);
+
+        UserEntity userEntity = createUserEntity(
+                req,
+                userEntityNo,
+                defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.empty());
@@ -121,5 +139,57 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.saveUser(req))
                 .isInstanceOf(InvalidReqParamException.class)
                 .hasMessage("중복된 닉네임입니다.");
+    }
+
+    @Test
+    @DisplayName("유저 프로필을 가져오는 데 성공한다")
+    void testSuccessToGetUserInfo() {
+
+        // given
+        Long userNo = 1L;
+        String loginId = "tester1";
+        String nickname = "무키무키";
+        String defaultPicUrl = "https://test/img.png";
+
+        UserEntity mockUserEntity = mock(UserEntity.class);
+        UserInfoResponse userInfo = UserInfoResponse.builder()
+                .userNo(userNo)
+                .loginId(loginId)
+                .nickname(nickname)
+                .picUrl(defaultPicUrl)
+                .build();
+
+        given(mockUserEntity.getNo()).willReturn(userNo);
+        given(mockUserEntity.getLoginId()).willReturn(loginId);
+        given(mockUserEntity.getNickname()).willReturn(nickname);
+        given(mockUserEntity.getPicUrl()).willReturn(defaultPicUrl);
+
+        given(userRepository.findById(userNo))
+                .willReturn(Optional.of(mockUserEntity));
+
+        // when
+        UserInfoResponse result = userService.getUserInfo(userNo);
+
+        // then
+        assertThat(userInfo.getUserNo()).isEqualTo(result.getUserNo());
+        assertThat(userInfo.getLoginId()).isEqualTo(result.getLoginId());
+        assertThat(userInfo.getNickname()).isEqualTo(result.getNickname());
+        assertThat(userInfo.getPicUrl()).isEqualTo(result.getPicUrl());
+    }
+
+    @Test
+    @DisplayName("유저 프로필을 가져오는 데 실패한다")
+    void testFailToGetUserInfo() {
+
+        // given
+        Long userNo = 1L;
+
+        given(userRepository.findById(userNo))
+                .willReturn(Optional.empty());
+
+        // when && then
+        assertThatThrownBy(() -> userService.getUserInfo(userNo))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("존재하지 않는 유저입니다.");
     }
 }

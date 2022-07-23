@@ -13,6 +13,7 @@ import java.util.Collection;
 @Getter
 public class UserDetailsImpl implements UserDetails {
 
+    private final Long userNo;
     private final String password;
     private final String username; // 실제 로그인 아이디
     private final String nickname;

@@ -3,9 +3,11 @@ package com.chiliclub.chilichat.service;
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
+import com.chiliclub.chilichat.component.S3Uploader;
 import com.chiliclub.chilichat.component.TokenProvider;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserDetailsImpl;
+import com.chiliclub.chilichat.model.user.UserInfoResponse;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import com.chiliclub.chilichat.model.user.UserSignInResponse;
 import com.chiliclub.chilichat.repository.UserRepository;
@@ -28,11 +30,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final S3Uploader s3Uploader;
 
     public Long saveUser(UserSaveRequest req) {
 
         validateDuplicatedUser(req); // 중복된 아이디와 닉네임 검사
-        UserEntity userEntity = UserEntity.create(req, passwordEncoder);
+        UserEntity userEntity = UserEntity.create(
+                req,
+                passwordEncoder,
+                s3Uploader.getDefaultPicUrl());
 
         return userRepository.save(userEntity).getNo();
     }
@@ -76,9 +82,17 @@ public class UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl principal = (UserDetailsImpl) authentication.getPrincipal();
 
-        UserEntity userEntity = userRepository.findByLoginId(principal.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("현재 인증된 유저가 존재하지 않습니다"));
+        UserEntity userEntity = userRepository.findById(principal.getUserNo())
+                .orElseThrow(() -> new ResourceNotFoundException("현재 인증된 유저가 존재하지 않습니다."));
 
         return userEntity.getNo();
+    }
+
+    public UserInfoResponse getUserInfo(Long userNo) {
+
+        UserEntity userEntity = userRepository.findById(userNo)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 유저입니다."));
+
+        return UserInfoResponse.from(userEntity);
     }
 }

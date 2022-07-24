@@ -1,6 +1,7 @@
 package com.chiliclub.chilichat.service;
 
 import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
+import com.chiliclub.chilichat.common.exception.RequestForbiddenException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
 import com.chiliclub.chilichat.component.S3Uploader;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -94,5 +96,37 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 유저입니다."));
 
         return UserInfoResponse.from(userEntity);
+    }
+
+    private void checkUserAuth(Long userNo) {
+        if (userNo.compareTo(getCurrentUserNo()) != 0) {
+            throw new RequestForbiddenException();
+        }
+    }
+
+    @Transactional
+    public String setUserNickname(Long userNo, String nickname) {
+
+        checkUserAuth(userNo);
+
+        UserEntity userEntity = userRepository.findById(userNo)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 유저입니다."));
+
+        userEntity.updateNickname(nickname);
+
+        return nickname;
+    }
+
+    @Transactional
+    public String setUserPicUrl(Long userNo, String picUrl) {
+
+        checkUserAuth(userNo);
+
+        UserEntity userEntity = userRepository.findById(userNo)
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 유저입니다."));
+
+        userEntity.updatePicUrl(picUrl);
+
+        return picUrl;
     }
 }

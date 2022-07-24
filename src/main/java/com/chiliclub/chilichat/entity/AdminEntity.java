@@ -31,4 +31,11 @@ public class AdminEntity extends BaseEntity {
         this.user = user;
         this.chatRoom = chatRoom;
     }
+
+    public static AdminEntity create(UserEntity user, ChatRoomEntity chatRoom) {
+        return AdminEntity.builder()
+                .user(user)
+                .chatRoom(chatRoom)
+                .build();
+    }
 }

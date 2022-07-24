@@ -85,7 +85,7 @@ public class UserService {
         UserDetailsImpl principal = (UserDetailsImpl) authentication.getPrincipal();
 
         UserEntity userEntity = userRepository.findById(principal.getUserNo())
-                .orElseThrow(() -> new ResourceNotFoundException("현재 인증된 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new RequestForbiddenException("현재 인증된 유저가 존재하지 않습니다."));
 
         return userEntity.getNo();
     }

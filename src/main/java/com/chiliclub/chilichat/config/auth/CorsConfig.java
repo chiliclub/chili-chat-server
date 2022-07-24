@@ -22,7 +22,7 @@ public class CorsConfig {
         config.addAllowedOrigin("*"); // 프론트 서버 or 프록시 호스트 확정되면 수정
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/user/**", config);
+        source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
     }

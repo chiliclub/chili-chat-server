@@ -50,6 +50,10 @@ public class UserEntity extends BaseEntity {
         this.picUrl = picUrl;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     public static UserEntity create(
             UserSaveRequest req,
             PasswordEncoder passwordEncoder,

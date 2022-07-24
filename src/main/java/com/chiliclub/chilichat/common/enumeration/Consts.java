@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 public final class Consts {
 
     public static String[] WHITE_LIST = {
-            "/test/error/**", "/user/signup", "/user/signin"
+            "/test/s3", "/test/error/**", "/user/signup", "/user/signin"
     };
 }

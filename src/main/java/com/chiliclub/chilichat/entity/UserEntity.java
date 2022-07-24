@@ -39,22 +39,28 @@ public class UserEntity extends BaseEntity {
     private String picUrl;
 
     @Builder
-    public UserEntity(String loginId, String password, String nickname) {
+    public UserEntity(String loginId, String password, String nickname, String picUrl) {
         this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;
+        this.picUrl = picUrl;
     }
 
     public void updatePicUrl(String picUrl) {
         this.picUrl = picUrl;
     }
 
-    public static UserEntity create(UserSaveRequest req, PasswordEncoder passwordEncoder) {
+    public static UserEntity create(
+            UserSaveRequest req,
+            PasswordEncoder passwordEncoder,
+            String defaultPicUrl
+    ) {
 
         return UserEntity.builder()
                 .loginId(req.getId())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .nickname(req.getNickname())
+                .picUrl(defaultPicUrl)
                 .build();
     }
 }

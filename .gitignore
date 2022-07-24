@@ -8,6 +8,7 @@ build/
 application-local.yml
 application-dev.yml
 application-prod.yml
+aws.yml
 
 ### STS ###
 .apt_generated

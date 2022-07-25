@@ -19,7 +19,7 @@ public class CorsConfig {
          * TODO: 세부 설정
          */
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("*"); // 프론트 서버 or 프록시 호스트 확정되면 수정
+        config.addAllowedOriginPattern("*"); // 프론트 서버 or 프록시 호스트 확정되면 수정
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);

@@ -34,6 +34,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final S3Uploader s3Uploader;
 
+    @Transactional
     public Long saveUser(UserSaveRequest req) {
 
         validateDuplicatedUser(req); // 중복된 아이디와 닉네임 검사

@@ -15,6 +15,7 @@ import com.chiliclub.chilichat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ public class ChatRoomService {
 
     private final UserService userService;
 
+    @Transactional
     public Long addChatRoom(ChatRoomCreateRequest chatRoomCreateRequest) {
 
         ChatRoomEntity chatRoom = ChatRoomEntity.create(chatRoomCreateRequest);
@@ -48,6 +50,7 @@ public class ChatRoomService {
                 .map(ChatRoomFindResponse::from).collect(Collectors.toList());
     }
 
+    @Transactional
     public void removeChatRoom(Long chatRoomNo) {
 
         checkUserIsAdminOfChatRoom(userService.getCurrentUserNo(), chatRoomNo);
@@ -55,6 +58,7 @@ public class ChatRoomService {
         chatRoomRepository.deleteById(chatRoomNo);
     }
 
+    @Transactional
     public ChatRoomUpdateResponse modifyChatRoom(Long chatRoomNo, ChatRoomUpdateRequest chatRoomUpdateRequest) {
         ChatRoomEntity chatRoomToModify = chatRoomRepository.findById(chatRoomNo)
                 .orElseThrow(ResourceNotFoundException::new);

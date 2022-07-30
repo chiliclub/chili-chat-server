@@ -39,7 +39,7 @@ public class UserEntity extends BaseEntity {
     private String picUrl;
 
     @Builder
-    public UserEntity(String loginId, String password, String nickname, String picUrl) {
+    private UserEntity(String loginId, String password, String nickname, String picUrl) {
         this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;

@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public interface AdminRepository extends JpaRepository<AdminEntity, Long> {
 
-    @Query("SELECT a from AdminEntity a WHERE a.user.no = :userNo")
+    @Query("SELECT a FROM AdminEntity a WHERE a.user.no = :userNo")
     Optional<AdminEntity> findByUserNo(@Param("userNo") Long userNo);
 
-    @Query("SELECT a from AdminEntity a WHERE a.user.no = :userNo and a.chatRoom.no = :chatRoomNo")
+    @Query("SELECT a FROM AdminEntity a WHERE a.user.no = :userNo and a.chatRoom.no = :chatRoomNo")
     Optional<AdminEntity> findByUserNoAndChatRoomNo(@Param("userNo") Long userNo, @Param("chatRoomNo") Long chatRoomNo);
 }

@@ -1,5 +1,6 @@
 package com.chiliclub.chilichat.entity;
 
+import com.chiliclub.chilichat.model.MessageRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -8,7 +9,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Builder
 @AllArgsConstructor
 @Table(name = "message")
 public class MessageEntity {
@@ -18,16 +18,28 @@ public class MessageEntity {
     @Column(name = "message_no")
     private Long no;
 
-    private String title;
-
     private Long senderNo;
 
-    private String senderNickname;
-
-    private String senderPicUrl;
+    private Long chatRoomNo;
 
     private String message;
 
     private LocalDateTime insDatetime;
+
+    @Builder
+    private MessageEntity(Long senderNo, Long chatRoomNo, String message) {
+        this.senderNo = senderNo;
+        this.message = message;
+        this.chatRoomNo = chatRoomNo;
+        this.insDatetime = LocalDateTime.now();
+    }
+
+    public static MessageEntity create(MessageRequest messageRequest, Long userNo) {
+        return MessageEntity.builder()
+                .senderNo(userNo)
+                .chatRoomNo(messageRequest.getChatRoomNo())
+                .message(messageRequest.getMessage())
+                .build();
+    }
 
 }

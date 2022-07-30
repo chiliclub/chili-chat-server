@@ -44,7 +44,7 @@ public class UserService {
     public Long saveUser(UserSaveRequest req) {
 
         validateDuplicatedUser(req); // 중복된 아이디와 닉네임 검사
-        UserEntity userEntity = UserEntity.create(
+        UserEntity userEntity = UserEntity.createFrom(
                 req,
                 passwordEncoder,
                 s3Uploader.getDefaultPicUrl());

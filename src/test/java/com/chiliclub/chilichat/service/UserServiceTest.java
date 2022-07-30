@@ -55,14 +55,35 @@ class UserServiceTest {
                 .build();
     }
 
-    private UserEntity createUserEntity(
+    private UserEntity createUserEntityFrom(
             UserSaveRequest req,
             Long userNo,
             String defaultPicUrl
     ) {
 
-        UserEntity userEntity = UserEntity.create(
+        UserEntity userEntity = UserEntity.createFrom(
                 req,
+                passwordEncoder,
+                defaultPicUrl);
+
+        ReflectionTestUtils.setField(userEntity, "no", userNo);
+
+        return userEntity;
+    }
+
+    private UserEntity createUserEntity(
+            Long userNo,
+            String loginId,
+            String password,
+            String nickname,
+            PasswordEncoder passwordEncoder,
+            String defaultPicUrl
+    ) {
+
+        UserEntity userEntity = UserEntity.create(
+                loginId,
+                password,
+                nickname,
                 passwordEncoder,
                 defaultPicUrl);
 
@@ -81,7 +102,7 @@ class UserServiceTest {
         Long userNo = 1L;
         String defaultPicUrl = "https://test/img.png";
 
-        UserEntity userEntity = createUserEntity(
+        UserEntity userEntity = createUserEntityFrom(
                 req,
                 userNo,
                 defaultPicUrl);
@@ -111,13 +132,13 @@ class UserServiceTest {
         Long userNo = 1L;
         String defaultPicUrl = "https://test/img.png";
 
-        UserEntity userEntity = createUserEntity(
+        UserEntity userEntity = createUserEntityFrom(
                 req,
                 userNo,
                 defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(Optional.ofNullable(userEntity));
+                .willReturn(Optional.of(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))
@@ -134,7 +155,7 @@ class UserServiceTest {
         Long userNo = 1L;
         String defaultPicUrl = "https://test/img.png";
 
-        UserEntity userEntity = createUserEntity(
+        UserEntity userEntity = createUserEntityFrom(
                 req,
                 userNo,
                 defaultPicUrl);
@@ -142,7 +163,7 @@ class UserServiceTest {
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
-                .willReturn(Optional.ofNullable(userEntity));
+                .willReturn(Optional.of(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))
@@ -156,25 +177,20 @@ class UserServiceTest {
 
         // given
         Long userNo = 1L;
-        String loginId = "tester1";
-        String nickname = "무키무키";
-        String defaultPicUrl = "https://test/img.png";
 
-        UserEntity mockUserEntity = mock(UserEntity.class);
-        UserInfoResponse userInfo = UserInfoResponse.builder()
-                .userNo(userNo)
-                .loginId(loginId)
-                .nickname(nickname)
-                .picUrl(defaultPicUrl)
-                .build();
+        UserEntity userEntity = createUserEntity(
+                userNo,
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
-        given(mockUserEntity.getNo()).willReturn(userNo);
-        given(mockUserEntity.getLoginId()).willReturn(loginId);
-        given(mockUserEntity.getNickname()).willReturn(nickname);
-        given(mockUserEntity.getPicUrl()).willReturn(defaultPicUrl);
+        UserInfoResponse userInfo = UserInfoResponse.from(userEntity);
 
         given(userRepository.findById(userNo))
-                .willReturn(Optional.of(mockUserEntity));
+                .willReturn(Optional.of(userEntity));
 
         // when
         UserInfoResponse result = userService.getUserInfo(userNo);
@@ -207,25 +223,26 @@ class UserServiceTest {
     void testSuccessToSetUserNickname() {
 
         // given
-        UserSaveRequest req = createAddUserRequest();
         Long userNo = 1L;
-        String defaultPicUrl = "https://test/img.png";
 
         UserEntity userEntity = createUserEntity(
-                req,
                 userNo,
-                defaultPicUrl);
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
         String newNickname = "루드 굴리트";
 
         doReturn(userNo).when(userService).getCurrentUserNo();
-        given(userRepository.findById(userNo)).willReturn(Optional.ofNullable(userEntity));
+        given(userRepository.findById(userNo)).willReturn(Optional.of(userEntity));
 
         // when
         String result = userService.setUserNickname(userNo, newNickname);
 
         // then
-        assert userEntity != null;
         assertThat(userEntity.getNickname()).isEqualTo(newNickname);
         assertThat(newNickname).isEqualTo(result);
     }
@@ -268,25 +285,26 @@ class UserServiceTest {
     void testSuccessToSetUserPicUrl() {
 
         // given
-        UserSaveRequest req = createAddUserRequest();
         Long userNo = 1L;
-        String defaultPicUrl = "https://test/img.png";
 
         UserEntity userEntity = createUserEntity(
-                req,
                 userNo,
-                defaultPicUrl);
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
         String newPicUrl = "https://test/new-img.png";
 
         doReturn(userNo).when(userService).getCurrentUserNo();
-        given(userRepository.findById(userNo)).willReturn(Optional.ofNullable(userEntity));
+        given(userRepository.findById(userNo)).willReturn(Optional.of(userEntity));
 
         // when
         String result = userService.setUserPicUrl(userNo, newPicUrl);
 
         // then
-        assert userEntity != null;
         assertThat(userEntity.getPicUrl()).isEqualTo(newPicUrl);
         assertThat(newPicUrl).isEqualTo(result);
     }
@@ -335,20 +353,31 @@ class UserServiceTest {
                 .title("채팅방1")
                 .build();
 
-        UserEntity mockUserEntity1 = mock(UserEntity.class);
-        UserEntity mockUserEntity2 = mock(UserEntity.class);
-        given(mockUserEntity1.getNo()).willReturn(1L);
-        given(mockUserEntity1.getLoginId()).willReturn("tester1");
-        given(mockUserEntity2.getNo()).willReturn(2L);
-        given(mockUserEntity2.getLoginId()).willReturn("tester2");
+        UserEntity userEntity1 = createUserEntity(
+                1L,
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
+
+        UserEntity userEntity2 = createUserEntity(
+                2L,
+                "tester2",
+                "password123",
+                "푸키푸키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
         UserChatRoomEntity userChatRoomEntity1 = UserChatRoomEntity.builder()
-                .user(mockUserEntity1)
+                .user(userEntity1)
                 .chatRoom(chatRoomEntity)
                 .build();
 
         UserChatRoomEntity userChatRoomEntity2 = UserChatRoomEntity.builder()
-                .user(mockUserEntity2)
+                .user(userEntity2)
                 .chatRoom(chatRoomEntity)
                 .build();
 
@@ -364,7 +393,9 @@ class UserServiceTest {
         // then
         assertThat(userInfoResponses.get(0).getUserNo()).isEqualTo(1L);
         assertThat(userInfoResponses.get(0).getLoginId()).isEqualTo("tester1");
+        assertThat(userInfoResponses.get(0).getNickname()).isEqualTo("무키무키");
         assertThat(userInfoResponses.get(1).getUserNo()).isEqualTo(2L);
         assertThat(userInfoResponses.get(1).getLoginId()).isEqualTo("tester2");
+        assertThat(userInfoResponses.get(1).getNickname()).isEqualTo("푸키푸키");
     }
 }

@@ -10,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name = "chat_room")
+@Table(name = "admin")
 public class AdminEntity extends BaseEntity {
 
     @Id

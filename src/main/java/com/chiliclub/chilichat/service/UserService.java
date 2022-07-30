@@ -6,11 +6,13 @@ import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.common.exception.UserNotAuthorizedException;
 import com.chiliclub.chilichat.component.S3Uploader;
 import com.chiliclub.chilichat.component.TokenProvider;
+import com.chiliclub.chilichat.entity.UserChatRoomEntity;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserDetailsImpl;
 import com.chiliclub.chilichat.model.user.UserInfoResponse;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import com.chiliclub.chilichat.model.user.UserSignInResponse;
+import com.chiliclub.chilichat.repository.UserChatRoomRepository;
 import com.chiliclub.chilichat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +25,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserChatRoomRepository userChatRoomRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -129,5 +135,14 @@ public class UserService {
         userEntity.updatePicUrl(picUrl);
 
         return picUrl;
+    }
+
+    public List<UserInfoResponse> getUserInfosByChatRoomNo(Long chatRoomNo) {
+
+        List<UserChatRoomEntity> userChatRoomEntities = userChatRoomRepository.findByNo(chatRoomNo);
+
+        return userChatRoomEntities.stream()
+                .map(e -> UserInfoResponse.from(e.getUser()))
+                .collect(Collectors.toList());
     }
 }

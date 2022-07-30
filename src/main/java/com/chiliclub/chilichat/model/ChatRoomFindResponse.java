@@ -17,20 +17,20 @@ public class ChatRoomFindResponse {
 
     private LocalDateTime insDatetime;
 
-    private LocalDateTime upDatetime;
+    private LocalDateTime updDatetime;
 
     @Builder
-    public ChatRoomFindResponse(String title, LocalDateTime insDatetime, LocalDateTime upDatetime) {
+    public ChatRoomFindResponse(String title, LocalDateTime insDatetime, LocalDateTime updDatetime) {
         this.title = title;
         this.insDatetime = insDatetime;
-        this.upDatetime = upDatetime;
+        this.updDatetime = updDatetime;
     }
 
     public static ChatRoomFindResponse from(ChatRoomEntity chatRoom) {
         return ChatRoomFindResponse.builder()
                 .title(chatRoom.getTitle())
                 .insDatetime(chatRoom.getInsDatetime())
-                .upDatetime(chatRoom.getUpdDatetime())
+                .updDatetime(chatRoom.getUpdDatetime())
                 .build();
     }
 }

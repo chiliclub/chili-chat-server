@@ -4,9 +4,12 @@ import com.chiliclub.chilichat.common.exception.InvalidReqParamException;
 import com.chiliclub.chilichat.common.exception.RequestForbiddenException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.component.S3Uploader;
+import com.chiliclub.chilichat.entity.ChatRoomEntity;
+import com.chiliclub.chilichat.entity.UserChatRoomEntity;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.user.UserInfoResponse;
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
+import com.chiliclub.chilichat.repository.UserChatRoomRepository;
 import com.chiliclub.chilichat.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +21,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +37,8 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserChatRoomRepository userChatRoomRepository;
     @Spy
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -315,5 +322,49 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.setUserPicUrl(userNo, newPicUrl))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("존재하지 않는 유저입니다.");
+    }
+
+    @Test
+    @DisplayName("채팅방 ID로 채팅방 내 모든 유저의 정보를 조회한다")
+    void testSuccessToGetUserInfosByChatRoomNo() {
+
+        // given
+        Long chatRoomNo = 1L;
+
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .title("채팅방1")
+                .build();
+
+        UserEntity mockUserEntity1 = mock(UserEntity.class);
+        UserEntity mockUserEntity2 = mock(UserEntity.class);
+        given(mockUserEntity1.getNo()).willReturn(1L);
+        given(mockUserEntity1.getLoginId()).willReturn("tester1");
+        given(mockUserEntity2.getNo()).willReturn(2L);
+        given(mockUserEntity2.getLoginId()).willReturn("tester2");
+
+        UserChatRoomEntity userChatRoomEntity1 = UserChatRoomEntity.builder()
+                .user(mockUserEntity1)
+                .chatRoom(chatRoomEntity)
+                .build();
+
+        UserChatRoomEntity userChatRoomEntity2 = UserChatRoomEntity.builder()
+                .user(mockUserEntity2)
+                .chatRoom(chatRoomEntity)
+                .build();
+
+        given(userChatRoomRepository.findByNo(chatRoomNo))
+                .willReturn(List.of(
+                        userChatRoomEntity1,
+                        userChatRoomEntity2
+                ));
+
+        // when
+        List<UserInfoResponse> userInfoResponses = userService.getUserInfosByChatRoomNo(chatRoomNo);
+
+        // then
+        assertThat(userInfoResponses.get(0).getUserNo()).isEqualTo(1L);
+        assertThat(userInfoResponses.get(0).getLoginId()).isEqualTo("tester1");
+        assertThat(userInfoResponses.get(1).getUserNo()).isEqualTo(2L);
+        assertThat(userInfoResponses.get(1).getLoginId()).isEqualTo("tester2");
     }
 }

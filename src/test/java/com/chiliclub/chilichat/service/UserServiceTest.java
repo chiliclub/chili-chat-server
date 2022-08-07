@@ -14,6 +14,9 @@ import com.chiliclub.chilichat.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -278,6 +281,87 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("존재하지 않는 유저입니다.");
+    }
+
+    @Test
+    @DisplayName("닉네임이 중복될 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfNicknameIsDuplicated() {
+
+        // given
+        Long userNo = 1L;
+        String newNickname = "루드 굴리트";
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+        given(userRepository.findByNickname(newNickname)).willReturn(Optional.ofNullable(mock(UserEntity.class)));
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("중복된 닉네임입니다.");
+    }
+
+    @Test
+    @DisplayName("닉네임이 2자 미만일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfLengthIsLessThan2() {
+
+        // given
+        Long userNo = 1L;
+        String newNickname = "루";
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 2-10자리 이내입니다.");
+    }
+
+    @Test
+    @DisplayName("닉네임이 10자 초과일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfLengthIsMoreThan10() {
+
+        // given
+        Long userNo = 1L;
+        String newNickname = "12345678910";
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 2-10자리 이내입니다.");
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    @DisplayName("닉네임이 공백일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfEmpty(String newNickname) {
+
+        // given
+        Long userNo = 1L;
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 공백문자로만 이루어질 수 없습니다.");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("닉네임이 null일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfNull(String newNickname) {
+
+        // given
+        Long userNo = 1L;
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 null이 될 수 없습니다.");
     }
 
     @Test

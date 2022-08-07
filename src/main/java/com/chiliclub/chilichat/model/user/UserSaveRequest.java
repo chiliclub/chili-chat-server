@@ -42,8 +42,12 @@ public class UserSaveRequest {
             value = "닉네임",
             example = "무키무키"
     )
-    @NotBlank(message = "닉네임은 공백문자로만 이루어질 수 없습니다")
-    @Size(min = 2, max = 10, message = "닉네임은 2-10자리 이내")
+    @Pattern(
+            regexp = "^[ㄱ-ㅎ가-힣a-zA-Z\\d]{2,10}$",
+            message = "닉네임은 2-10자리 이내"
+    )
+//    @NotBlank(message = "닉네임은 공백문자로만 이루어질 수 없습니다")
+//    @Size(min = 2, max = 10, message = "닉네임은 2-10자리 이내")
     private String nickname;
 
     @Builder

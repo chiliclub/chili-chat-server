@@ -76,7 +76,7 @@ public class UserEntity extends BaseEntity {
         return new UserEntity(
                 req.getId(),
                 passwordEncoder.encode(req.getPassword()),
-                req.getNickname(),
+                req.getNickname().trim(),
                 defaultPicUrl);
     }
 }

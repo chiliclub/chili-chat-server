@@ -11,4 +11,6 @@ public interface UserChatRoomRepository extends JpaRepository<UserChatRoomEntity
 
     @Query("SELECT uc FROM UserChatRoomEntity uc JOIN FETCH uc.user WHERE uc.chatRoom.no = :chatRoomNo")
     List<UserChatRoomEntity> findByNo(@Param("chatRoomNo") Long chatRoomNo);
+
+    int countByChatRoomNo(Long chatRoomNo);
 }

@@ -9,9 +9,7 @@ import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
 import com.chiliclub.chilichat.model.ChatRoomFindResponse;
 import com.chiliclub.chilichat.model.ChatRoomUpdateRequest;
 import com.chiliclub.chilichat.model.ChatRoomUpdateResponse;
-import com.chiliclub.chilichat.repository.AdminRepository;
-import com.chiliclub.chilichat.repository.ChatRoomRepository;
-import com.chiliclub.chilichat.repository.UserRepository;
+import com.chiliclub.chilichat.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,10 @@ public class ChatRoomService {
 
     private final UserService userService;
 
+    private final UserChatRoomRepository userChatRoomRepository;
+
+    private final CustomJpaRepository customJpaRepository;
+
     @Transactional
     public Long addChatRoom(ChatRoomCreateRequest chatRoomCreateRequest) {
 
@@ -46,8 +48,7 @@ public class ChatRoomService {
     }
 
     public List<ChatRoomFindResponse> findChatRoomList() {
-        return chatRoomRepository.findAll().stream()
-                .map(ChatRoomFindResponse::from).collect(Collectors.toList());
+        return customJpaRepository.findChatRoomListWithAdminAndParticipantCount();
     }
 
     @Transactional

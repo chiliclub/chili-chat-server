@@ -14,6 +14,9 @@ import com.chiliclub.chilichat.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -55,14 +58,35 @@ class UserServiceTest {
                 .build();
     }
 
-    private UserEntity createUserEntity(
+    private UserEntity createUserEntityFrom(
             UserSaveRequest req,
             Long userNo,
             String defaultPicUrl
     ) {
 
-        UserEntity userEntity = UserEntity.create(
+        UserEntity userEntity = UserEntity.createFrom(
                 req,
+                passwordEncoder,
+                defaultPicUrl);
+
+        ReflectionTestUtils.setField(userEntity, "no", userNo);
+
+        return userEntity;
+    }
+
+    private UserEntity createUserEntity(
+            Long userNo,
+            String loginId,
+            String password,
+            String nickname,
+            PasswordEncoder passwordEncoder,
+            String defaultPicUrl
+    ) {
+
+        UserEntity userEntity = UserEntity.create(
+                loginId,
+                password,
+                nickname,
                 passwordEncoder,
                 defaultPicUrl);
 
@@ -81,7 +105,7 @@ class UserServiceTest {
         Long userNo = 1L;
         String defaultPicUrl = "https://test/img.png";
 
-        UserEntity userEntity = createUserEntity(
+        UserEntity userEntity = createUserEntityFrom(
                 req,
                 userNo,
                 defaultPicUrl);
@@ -111,13 +135,13 @@ class UserServiceTest {
         Long userNo = 1L;
         String defaultPicUrl = "https://test/img.png";
 
-        UserEntity userEntity = createUserEntity(
+        UserEntity userEntity = createUserEntityFrom(
                 req,
                 userNo,
                 defaultPicUrl);
 
         given(userRepository.findByLoginId(any(String.class)))
-                .willReturn(Optional.ofNullable(userEntity));
+                .willReturn(Optional.of(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))
@@ -134,7 +158,7 @@ class UserServiceTest {
         Long userNo = 1L;
         String defaultPicUrl = "https://test/img.png";
 
-        UserEntity userEntity = createUserEntity(
+        UserEntity userEntity = createUserEntityFrom(
                 req,
                 userNo,
                 defaultPicUrl);
@@ -142,7 +166,7 @@ class UserServiceTest {
         given(userRepository.findByLoginId(any(String.class)))
                 .willReturn(Optional.empty());
         given(userRepository.findByNickname(any(String.class)))
-                .willReturn(Optional.ofNullable(userEntity));
+                .willReturn(Optional.of(userEntity));
 
         // when && then
         assertThatThrownBy(() -> userService.saveUser(req))
@@ -156,25 +180,20 @@ class UserServiceTest {
 
         // given
         Long userNo = 1L;
-        String loginId = "tester1";
-        String nickname = "무키무키";
-        String defaultPicUrl = "https://test/img.png";
 
-        UserEntity mockUserEntity = mock(UserEntity.class);
-        UserInfoResponse userInfo = UserInfoResponse.builder()
-                .userNo(userNo)
-                .loginId(loginId)
-                .nickname(nickname)
-                .picUrl(defaultPicUrl)
-                .build();
+        UserEntity userEntity = createUserEntity(
+                userNo,
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
-        given(mockUserEntity.getNo()).willReturn(userNo);
-        given(mockUserEntity.getLoginId()).willReturn(loginId);
-        given(mockUserEntity.getNickname()).willReturn(nickname);
-        given(mockUserEntity.getPicUrl()).willReturn(defaultPicUrl);
+        UserInfoResponse userInfo = UserInfoResponse.from(userEntity);
 
         given(userRepository.findById(userNo))
-                .willReturn(Optional.of(mockUserEntity));
+                .willReturn(Optional.of(userEntity));
 
         // when
         UserInfoResponse result = userService.getUserInfo(userNo);
@@ -207,25 +226,26 @@ class UserServiceTest {
     void testSuccessToSetUserNickname() {
 
         // given
-        UserSaveRequest req = createAddUserRequest();
         Long userNo = 1L;
-        String defaultPicUrl = "https://test/img.png";
 
         UserEntity userEntity = createUserEntity(
-                req,
                 userNo,
-                defaultPicUrl);
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
         String newNickname = "루드 굴리트";
 
         doReturn(userNo).when(userService).getCurrentUserNo();
-        given(userRepository.findById(userNo)).willReturn(Optional.ofNullable(userEntity));
+        given(userRepository.findById(userNo)).willReturn(Optional.of(userEntity));
 
         // when
         String result = userService.setUserNickname(userNo, newNickname);
 
         // then
-        assert userEntity != null;
         assertThat(userEntity.getNickname()).isEqualTo(newNickname);
         assertThat(newNickname).isEqualTo(result);
     }
@@ -264,29 +284,111 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("닉네임이 중복될 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfNicknameIsDuplicated() {
+
+        // given
+        Long userNo = 1L;
+        String newNickname = "루드 굴리트";
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+        given(userRepository.findByNickname(newNickname)).willReturn(Optional.ofNullable(mock(UserEntity.class)));
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("중복된 닉네임입니다.");
+    }
+
+    @Test
+    @DisplayName("닉네임이 2자 미만일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfLengthIsLessThan2() {
+
+        // given
+        Long userNo = 1L;
+        String newNickname = "루";
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 2-10자리 이내입니다.");
+    }
+
+    @Test
+    @DisplayName("닉네임이 10자 초과일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfLengthIsMoreThan10() {
+
+        // given
+        Long userNo = 1L;
+        String newNickname = "12345678910";
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 2-10자리 이내입니다.");
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    @DisplayName("닉네임이 공백일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfEmpty(String newNickname) {
+
+        // given
+        Long userNo = 1L;
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 공백문자로만 이루어질 수 없습니다.");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("닉네임이 null일 경우 닉네임을 수정하는 데 실패한다")
+    void testFailToSetUserNicknameIfNull(String newNickname) {
+
+        // given
+        Long userNo = 1L;
+
+        doReturn(userNo).when(userService).getCurrentUserNo();
+
+        // when && then
+        assertThatThrownBy(() -> userService.setUserNickname(userNo, newNickname))
+                .isInstanceOf(InvalidReqParamException.class)
+                .hasMessage("닉네임은 null이 될 수 없습니다.");
+    }
+
+    @Test
     @DisplayName("유저의 프로필 사진을 수정하는 데 성공한다")
     void testSuccessToSetUserPicUrl() {
 
         // given
-        UserSaveRequest req = createAddUserRequest();
         Long userNo = 1L;
-        String defaultPicUrl = "https://test/img.png";
 
         UserEntity userEntity = createUserEntity(
-                req,
                 userNo,
-                defaultPicUrl);
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
         String newPicUrl = "https://test/new-img.png";
 
         doReturn(userNo).when(userService).getCurrentUserNo();
-        given(userRepository.findById(userNo)).willReturn(Optional.ofNullable(userEntity));
+        given(userRepository.findById(userNo)).willReturn(Optional.of(userEntity));
 
         // when
         String result = userService.setUserPicUrl(userNo, newPicUrl);
 
         // then
-        assert userEntity != null;
         assertThat(userEntity.getPicUrl()).isEqualTo(newPicUrl);
         assertThat(newPicUrl).isEqualTo(result);
     }
@@ -335,20 +437,31 @@ class UserServiceTest {
                 .title("채팅방1")
                 .build();
 
-        UserEntity mockUserEntity1 = mock(UserEntity.class);
-        UserEntity mockUserEntity2 = mock(UserEntity.class);
-        given(mockUserEntity1.getNo()).willReturn(1L);
-        given(mockUserEntity1.getLoginId()).willReturn("tester1");
-        given(mockUserEntity2.getNo()).willReturn(2L);
-        given(mockUserEntity2.getLoginId()).willReturn("tester2");
+        UserEntity userEntity1 = createUserEntity(
+                1L,
+                "tester1",
+                "password123",
+                "무키무키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
+
+        UserEntity userEntity2 = createUserEntity(
+                2L,
+                "tester2",
+                "password123",
+                "푸키푸키",
+                passwordEncoder,
+                "https://test/img.png"
+        );
 
         UserChatRoomEntity userChatRoomEntity1 = UserChatRoomEntity.builder()
-                .user(mockUserEntity1)
+                .user(userEntity1)
                 .chatRoom(chatRoomEntity)
                 .build();
 
         UserChatRoomEntity userChatRoomEntity2 = UserChatRoomEntity.builder()
-                .user(mockUserEntity2)
+                .user(userEntity2)
                 .chatRoom(chatRoomEntity)
                 .build();
 
@@ -364,7 +477,9 @@ class UserServiceTest {
         // then
         assertThat(userInfoResponses.get(0).getUserNo()).isEqualTo(1L);
         assertThat(userInfoResponses.get(0).getLoginId()).isEqualTo("tester1");
+        assertThat(userInfoResponses.get(0).getNickname()).isEqualTo("무키무키");
         assertThat(userInfoResponses.get(1).getUserNo()).isEqualTo(2L);
         assertThat(userInfoResponses.get(1).getLoginId()).isEqualTo("tester2");
+        assertThat(userInfoResponses.get(1).getNickname()).isEqualTo("푸키푸키");
     }
 }

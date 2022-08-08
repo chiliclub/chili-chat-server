@@ -44,7 +44,7 @@ public class UserService {
     public Long saveUser(UserSaveRequest req) {
 
         validateDuplicatedUser(req); // 중복된 아이디와 닉네임 검사
-        UserEntity userEntity = UserEntity.create(
+        UserEntity userEntity = UserEntity.createFrom(
                 req,
                 passwordEncoder,
                 s3Uploader.getDefaultPicUrl());
@@ -54,13 +54,21 @@ public class UserService {
 
     private void validateDuplicatedUser(UserSaveRequest req) {
 
-        if (userRepository.findByLoginId(req.getId()).isPresent()) {
+        if (isLoginIdDuplicated(req.getId())) {
             throw new InvalidReqParamException("중복된 아이디입니다.");
         }
 
-        if (userRepository.findByNickname(req.getNickname()).isPresent()) {
+        if (isNicknameDuplicated(req.getNickname())) {
             throw new InvalidReqParamException("중복된 닉네임입니다.");
         }
+    }
+
+    private boolean isNicknameDuplicated(String nickname) {
+        return userRepository.findByNickname(nickname).isPresent();
+    }
+
+    private boolean isLoginIdDuplicated(String loginId) {
+        return userRepository.findByLoginId(loginId).isPresent();
     }
 
     public UserSignInResponse signIn(String id, String password) {
@@ -116,18 +124,37 @@ public class UserService {
 
         checkUserAuth(userNo);
 
+        String newNickname = validateNickname(nickname);
+
         UserEntity userEntity = userRepository.findById(userNo)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 유저입니다."));
 
-        userEntity.updateNickname(nickname);
+        userEntity.updateNickname(newNickname);
 
-        return nickname;
+        return newNickname;
+    }
+
+    private String validateNickname(String nickname) {
+        if (nickname == null) {
+            throw new InvalidReqParamException("닉네임은 null이 될 수 없습니다.");
+        }
+        if (nickname.isBlank()) {
+            throw new InvalidReqParamException("닉네임은 공백문자로만 이루어질 수 없습니다.");
+        }
+        if (nickname.length() < 2 || nickname.length() > 10) {
+            throw new InvalidReqParamException("닉네임은 2-10자리 이내입니다.");
+        }
+        if (isNicknameDuplicated(nickname)) {
+            throw new InvalidReqParamException("중복된 닉네임입니다.");
+        }
+        return nickname.trim();
     }
 
     @Transactional
     public String setUserPicUrl(Long userNo, String picUrl) {
 
         checkUserAuth(userNo);
+        validatePicUrl(picUrl);
 
         UserEntity userEntity = userRepository.findById(userNo)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 유저입니다."));
@@ -135,6 +162,12 @@ public class UserService {
         userEntity.updatePicUrl(picUrl);
 
         return picUrl;
+    }
+
+    private void validatePicUrl(String picUrl) {
+        if (picUrl.isBlank()) {
+            throw new InvalidReqParamException("닉네임은 공백문자로만 이루어질 수 없습니다.");
+        }
     }
 
     public List<UserInfoResponse> getUserInfosByChatRoomNo(Long chatRoomNo) {

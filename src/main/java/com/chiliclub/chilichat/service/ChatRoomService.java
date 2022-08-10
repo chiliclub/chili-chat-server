@@ -4,6 +4,7 @@ import com.chiliclub.chilichat.common.exception.RequestForbiddenException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.entity.AdminEntity;
 import com.chiliclub.chilichat.entity.ChatRoomEntity;
+import com.chiliclub.chilichat.entity.UserChatRoomEntity;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
 import com.chiliclub.chilichat.model.ChatRoomFindResponse;
@@ -49,6 +50,28 @@ public class ChatRoomService {
 
     public List<ChatRoomFindResponse> findChatRoomList() {
         return customJpaRepository.findChatRoomListWithAdminAndParticipantCount();
+    }
+
+    public List<ChatRoomFindResponse> findChatRoomList2() {
+
+        List<ChatRoomEntity> chatRoomEntities = chatRoomRepository.fetchAll();
+        List<UserChatRoomEntity> userChatRoomEntities = userChatRoomRepository.findAll();
+
+        return chatRoomEntities.stream().map(chatRoomEntity -> {
+            // TODO: 최적화
+            // chatRoomEntity의 chatRoomNo이 동일한 userChatRoomEntity의 개수를 셈
+            long totalParticipantCount = userChatRoomEntities.stream().filter(userChatRoomEntity ->
+                    userChatRoomEntity.getChatRoom().getNo().equals(chatRoomEntity.getNo())
+            ).count();
+
+            return ChatRoomFindResponse.builder()
+                    .title(chatRoomEntity.getTitle())
+                    .insDatetime(chatRoomEntity.getInsDatetime())
+                    .updDatetime(chatRoomEntity.getUpdDatetime())
+                    .adminUserNo(chatRoomEntity.getAdmin().getUser().getNo())
+                    .totalParticipantCount((int) totalParticipantCount)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     @Transactional

@@ -37,7 +37,8 @@ public class ChatRoomController {
     @ApiOperation(value = "채팅방 목록 조회")
     @GetMapping("")
     public ResponseEntity<List<ChatRoomFindResponse>> chatRoomList() {
-        return ResponseEntity.ok(chatRoomService.findChatRoomList());
+//        return ResponseEntity.ok(chatRoomService.findChatRoomList());
+        return ResponseEntity.ok(chatRoomService.findChatRoomList2());
     }
 
     @ApiOperation(value = "채팅방 삭제")

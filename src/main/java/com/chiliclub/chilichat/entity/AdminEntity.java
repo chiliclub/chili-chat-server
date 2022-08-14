@@ -38,4 +38,8 @@ public class AdminEntity extends BaseEntity {
                 .chatRoom(chatRoom)
                 .build();
     }
+
+    public void setChatRoom(ChatRoomEntity chatRoom) {
+        this.chatRoom = chatRoom;
+    }
 }

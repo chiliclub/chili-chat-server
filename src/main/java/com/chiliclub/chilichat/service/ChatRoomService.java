@@ -40,12 +40,18 @@ public class ChatRoomService {
     public Long addChatRoom(ChatRoomCreateRequest chatRoomCreateRequest) {
 
         ChatRoomEntity chatRoom = ChatRoomEntity.create(chatRoomCreateRequest);
-        UserEntity currentUser = userRepository.findByNo(userService.getCurrentUserNo());
 
         // 현재 사용자를 Admin으로 생성
-        adminRepository.save(AdminEntity.create(currentUser, chatRoom));
+        UserEntity currentUser = userRepository.findByNo(userService.getCurrentUserNo());
+        AdminEntity admin = AdminEntity.create(currentUser, chatRoom);
 
-        return chatRoomRepository.save(ChatRoomEntity.create(chatRoomCreateRequest)).getNo();
+        chatRoom.setAdmin(admin);
+        Long addedChatRoomNo = chatRoomRepository.save(chatRoom).getNo();
+        adminRepository.save(admin);
+
+        userChatRoomRepository.save(UserChatRoomEntity.create(currentUser, chatRoom));
+
+        return addedChatRoomNo;
     }
 
     public List<ChatRoomFindResponse> findChatRoomList() {

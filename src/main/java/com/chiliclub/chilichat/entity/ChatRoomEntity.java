@@ -48,6 +48,11 @@ public class ChatRoomEntity extends BaseEntity {
         return chatRoomEntity;
     }
 
+    public void setAdmin(AdminEntity admin) {
+        this.admin = admin;
+        admin.setChatRoom(this);
+    }
+
     public void update(ChatRoomUpdateRequest req) {
         this.title = req.getTitle();
     }

@@ -28,8 +28,14 @@ public class UserChatRoomEntity extends BaseEntity {
 
     @Builder
     public UserChatRoomEntity(Long no, UserEntity user, ChatRoomEntity chatRoom) {
-        this.no = no;
         this.user = user;
         this.chatRoom = chatRoom;
+    }
+
+    public static UserChatRoomEntity create(UserEntity user, ChatRoomEntity chatRoom) {
+        return UserChatRoomEntity.builder()
+                .user(user)
+                .chatRoom(chatRoom)
+                .build();
     }
 }

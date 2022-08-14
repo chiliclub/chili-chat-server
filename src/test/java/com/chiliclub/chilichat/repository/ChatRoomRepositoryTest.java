@@ -1,7 +1,6 @@
 package com.chiliclub.chilichat.repository;
 
 import com.chiliclub.chilichat.entity.ChatRoomEntity;
-import com.chiliclub.chilichat.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,20 +24,20 @@ public class ChatRoomRepositoryTest {
     @Autowired
     AdminRepository adminRepository;
 
-    private ChatRoomEntity createChatRoomEntity() {
-        return ChatRoomEntity.builder()
-                .title("ddd")
-                .build();
-    }
-
-    private UserEntity createUserEntity(String loginId, String nickname) {
-        return UserEntity.builder()
-                .loginId(loginId)
-                .nickname(nickname)
-                .password("qwe1234")
-                .picUrl("aaaaa")
-                .build();
-    }
+//    private ChatRoomEntity createChatRoomEntity() {
+//        return ChatRoomEntity.builder()
+//                .title("ddd")
+//                .build();
+//    }
+//
+//    private UserEntity createUserEntity(String loginId, String nickname) {
+//        return UserEntity.builder()
+//                .loginId(loginId)
+//                .nickname(nickname)
+//                .password("qwe1234")
+//                .picUrl("aaaaa")
+//                .build();
+//    }
 
     @BeforeEach
     void init() {

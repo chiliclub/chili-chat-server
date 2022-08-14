@@ -76,6 +76,7 @@ public class ChatRoomService {
                     .insDatetime(chatRoomEntity.getInsDatetime())
                     .updDatetime(chatRoomEntity.getUpdDatetime())
                     .adminUserNo(chatRoomEntity.getAdmin().getUser().getNo())
+                    .adminUserNickname(chatRoomEntity.getAdmin().getUser().getNickname())
                     .totalParticipantCount((int) totalParticipantCount)
                     .build();
         }).collect(Collectors.toList());

@@ -25,6 +25,8 @@ public class ChatRoomFindResponse {
 
     private Long adminUserNo;
 
+    private String adminUserNickname;
+
     private int totalParticipantCount;
 
     public ChatRoomFindResponse(Long chatRoomNo, String title, LocalDateTime insDatetime, LocalDateTime updDatetime, Long adminUserNo, Integer totalParticipantCount) {

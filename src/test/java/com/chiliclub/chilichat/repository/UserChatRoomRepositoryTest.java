@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -26,6 +28,8 @@ class UserChatRoomRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     private ChatRoomEntity createChatRoomEntity() {
         return ChatRoomEntity.builder()
                 .title("ddd")
@@ -33,12 +37,14 @@ class UserChatRoomRepositoryTest {
     }
 
     private UserEntity createUserEntity(String loginId, String nickname) {
-        return UserEntity.builder()
-                .loginId(loginId)
-                .nickname(nickname)
-                .password("qwe1234")
-                .picUrl("aaaaa")
-                .build();
+        return UserEntity.create(
+                loginId,
+                "qwe1234",
+                nickname,
+                passwordEncoder,
+                "aaaa"
+
+        );
     }
 
     private UserChatRoomEntity createUserChatRoomEntity(UserEntity user, ChatRoomEntity chatRoom) {

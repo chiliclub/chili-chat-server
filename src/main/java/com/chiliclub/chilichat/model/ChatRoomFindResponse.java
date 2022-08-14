@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatRoomFindResponse {
 
+    private Long chatRoomNo;
+
     private String title;
 
     private LocalDateTime insDatetime;
@@ -25,7 +27,8 @@ public class ChatRoomFindResponse {
 
     private int totalParticipantCount;
 
-    public ChatRoomFindResponse(String title, LocalDateTime insDatetime, LocalDateTime updDatetime, Long adminUserNo, Integer totalParticipantCount) {
+    public ChatRoomFindResponse(Long chatRoomNo, String title, LocalDateTime insDatetime, LocalDateTime updDatetime, Long adminUserNo, Integer totalParticipantCount) {
+        this.chatRoomNo = chatRoomNo;
         this.title = title;
         this.insDatetime = insDatetime;
         this.updDatetime = updDatetime;

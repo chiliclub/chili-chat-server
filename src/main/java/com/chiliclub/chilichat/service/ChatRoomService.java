@@ -65,6 +65,7 @@ public class ChatRoomService {
             ).count();
 
             return ChatRoomFindResponse.builder()
+                    .chatRoomNo(chatRoomEntity.getNo())
                     .title(chatRoomEntity.getTitle())
                     .insDatetime(chatRoomEntity.getInsDatetime())
                     .updDatetime(chatRoomEntity.getUpdDatetime())

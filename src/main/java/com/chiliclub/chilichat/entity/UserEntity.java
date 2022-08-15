@@ -2,7 +2,6 @@ package com.chiliclub.chilichat.entity;
 
 import com.chiliclub.chilichat.model.user.UserSaveRequest;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,8 +37,7 @@ public class UserEntity extends BaseEntity {
 
     private String picUrl;
 
-    @Builder
-    public UserEntity(String loginId, String password, String nickname, String picUrl) {
+    private UserEntity(String loginId, String password, String nickname, String picUrl) {
         this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;
@@ -50,17 +48,35 @@ public class UserEntity extends BaseEntity {
         this.picUrl = picUrl;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     public static UserEntity create(
+            String loginId,
+            String password,
+            String nickname,
+            PasswordEncoder passwordEncoder,
+            String defaultPicUrl
+    ) {
+        return new UserEntity(
+                loginId,
+                passwordEncoder.encode(password),
+                nickname,
+                defaultPicUrl
+        );
+    }
+
+    public static UserEntity createFrom(
             UserSaveRequest req,
             PasswordEncoder passwordEncoder,
             String defaultPicUrl
     ) {
 
-        return UserEntity.builder()
-                .loginId(req.getId())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .nickname(req.getNickname())
-                .picUrl(defaultPicUrl)
-                .build();
+        return new UserEntity(
+                req.getId(),
+                passwordEncoder.encode(req.getPassword()),
+                req.getNickname().trim(),
+                defaultPicUrl);
     }
 }

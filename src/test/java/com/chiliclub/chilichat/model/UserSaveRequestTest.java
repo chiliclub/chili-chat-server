@@ -258,7 +258,7 @@ class UserSaveRequestTest {
 
         // then
         assertThat(violations.size()).isEqualTo(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("닉네임은 공백문자로만 이루어질 수 없습니다");
+        assertThat(violations.iterator().next().getMessage()).isEqualTo("닉네임은 2-10자리 이내");
     }
 
     @Test

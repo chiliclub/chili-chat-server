@@ -4,7 +4,9 @@ import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
 import com.chiliclub.chilichat.model.ChatRoomFindResponse;
 import com.chiliclub.chilichat.model.ChatRoomUpdateRequest;
 import com.chiliclub.chilichat.model.ChatRoomUpdateResponse;
+import com.chiliclub.chilichat.model.user.UserInfoResponse;
 import com.chiliclub.chilichat.service.ChatRoomService;
+import com.chiliclub.chilichat.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
+    private final UserService userService;
 
     @ApiOperation(value = "채팅방 생성")
     @PostMapping("")
@@ -34,7 +37,8 @@ public class ChatRoomController {
     @ApiOperation(value = "채팅방 목록 조회")
     @GetMapping("")
     public ResponseEntity<List<ChatRoomFindResponse>> chatRoomList() {
-        return ResponseEntity.ok(chatRoomService.findChatRoomList());
+//        return ResponseEntity.ok(chatRoomService.findChatRoomList());
+        return ResponseEntity.ok(chatRoomService.findChatRoomList2());
     }
 
     @ApiOperation(value = "채팅방 삭제")
@@ -55,5 +59,13 @@ public class ChatRoomController {
         ChatRoomUpdateResponse chatRoomUpdateResponse = chatRoomService.modifyChatRoom(chatRoomNo, chatRoomUpdateRequest);
 
         return ResponseEntity.ok(chatRoomUpdateResponse);
+    }
+
+    @ApiOperation(value = "채팅방 내 유저 정보 전체조회")
+    @GetMapping("/{chatRoomNo}/users")
+    public ResponseEntity<List<UserInfoResponse>> userInfosInChatRoom(
+            @PathVariable Long chatRoomNo
+    ) {
+        return ResponseEntity.ok(userService.getUserInfosByChatRoomNo(chatRoomNo));
     }
 }

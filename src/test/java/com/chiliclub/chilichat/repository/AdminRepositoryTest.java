@@ -11,4 +11,8 @@ class AdminRepositoryTest {
     @Autowired
     private AdminRepository adminRepository;
 
+//    @Test
+//    void test() {
+//        adminRepository.findByUserNo(1L);
+//    }
 }

@@ -1,7 +1,7 @@
 package com.chiliclub.chilichat.model;
 
-import com.chiliclub.chilichat.entity.ChatRoomEntity;
 import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,26 +11,30 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @ApiModel
+@AllArgsConstructor
+@Builder
 public class ChatRoomFindResponse {
+
+    private Long chatRoomNo;
 
     private String title;
 
     private LocalDateTime insDatetime;
 
-    private LocalDateTime upDatetime;
+    private LocalDateTime updDatetime;
 
-    @Builder
-    public ChatRoomFindResponse(String title, LocalDateTime insDatetime, LocalDateTime upDatetime) {
+    private Long adminUserNo;
+
+    private String adminUserNickname;
+
+    private int totalParticipantCount;
+
+    public ChatRoomFindResponse(Long chatRoomNo, String title, LocalDateTime insDatetime, LocalDateTime updDatetime, Long adminUserNo, Integer totalParticipantCount) {
+        this.chatRoomNo = chatRoomNo;
         this.title = title;
         this.insDatetime = insDatetime;
-        this.upDatetime = upDatetime;
-    }
-
-    public static ChatRoomFindResponse from(ChatRoomEntity chatRoom) {
-        return ChatRoomFindResponse.builder()
-                .title(chatRoom.getTitle())
-                .insDatetime(chatRoom.getInsDatetime())
-                .upDatetime(chatRoom.getUpdDatetime())
-                .build();
+        this.updDatetime = updDatetime;
+        this.adminUserNo = adminUserNo;
+        this.totalParticipantCount = totalParticipantCount;
     }
 }

@@ -4,17 +4,17 @@ import com.chiliclub.chilichat.common.exception.RequestForbiddenException;
 import com.chiliclub.chilichat.common.exception.ResourceNotFoundException;
 import com.chiliclub.chilichat.entity.AdminEntity;
 import com.chiliclub.chilichat.entity.ChatRoomEntity;
+import com.chiliclub.chilichat.entity.UserChatRoomEntity;
 import com.chiliclub.chilichat.entity.UserEntity;
 import com.chiliclub.chilichat.model.ChatRoomCreateRequest;
 import com.chiliclub.chilichat.model.ChatRoomFindResponse;
 import com.chiliclub.chilichat.model.ChatRoomUpdateRequest;
 import com.chiliclub.chilichat.model.ChatRoomUpdateResponse;
-import com.chiliclub.chilichat.repository.AdminRepository;
-import com.chiliclub.chilichat.repository.ChatRoomRepository;
-import com.chiliclub.chilichat.repository.UserRepository;
+import com.chiliclub.chilichat.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,22 +32,57 @@ public class ChatRoomService {
 
     private final UserService userService;
 
+    private final UserChatRoomRepository userChatRoomRepository;
+
+    private final CustomJpaRepository customJpaRepository;
+
+    @Transactional
     public Long addChatRoom(ChatRoomCreateRequest chatRoomCreateRequest) {
 
         ChatRoomEntity chatRoom = ChatRoomEntity.create(chatRoomCreateRequest);
-        UserEntity currentUser = userRepository.findByNo(userService.getCurrentUserNo());
 
         // 현재 사용자를 Admin으로 생성
-        adminRepository.save(AdminEntity.create(currentUser, chatRoom));
+        UserEntity currentUser = userRepository.findByNo(userService.getCurrentUserNo());
+        AdminEntity admin = AdminEntity.create(currentUser, chatRoom);
 
-        return chatRoomRepository.save(ChatRoomEntity.create(chatRoomCreateRequest)).getNo();
+        chatRoom.setAdmin(admin);
+        Long addedChatRoomNo = chatRoomRepository.save(chatRoom).getNo();
+        adminRepository.save(admin);
+
+        userChatRoomRepository.save(UserChatRoomEntity.create(currentUser, chatRoom));
+
+        return addedChatRoomNo;
     }
 
     public List<ChatRoomFindResponse> findChatRoomList() {
-        return chatRoomRepository.findAll().stream()
-                .map(ChatRoomFindResponse::from).collect(Collectors.toList());
+        return customJpaRepository.findChatRoomListWithAdminAndParticipantCount();
     }
 
+    public List<ChatRoomFindResponse> findChatRoomList2() {
+
+        List<ChatRoomEntity> chatRoomEntities = chatRoomRepository.fetchAll();
+        List<UserChatRoomEntity> userChatRoomEntities = userChatRoomRepository.findAll();
+
+        return chatRoomEntities.stream().map(chatRoomEntity -> {
+            // TODO: 최적화
+            // chatRoomEntity의 chatRoomNo이 동일한 userChatRoomEntity의 개수를 셈
+            long totalParticipantCount = userChatRoomEntities.stream().filter(userChatRoomEntity ->
+                    userChatRoomEntity.getChatRoom().getNo().equals(chatRoomEntity.getNo())
+            ).count();
+
+            return ChatRoomFindResponse.builder()
+                    .chatRoomNo(chatRoomEntity.getNo())
+                    .title(chatRoomEntity.getTitle())
+                    .insDatetime(chatRoomEntity.getInsDatetime())
+                    .updDatetime(chatRoomEntity.getUpdDatetime())
+                    .adminUserNo(chatRoomEntity.getAdmin().getUser().getNo())
+                    .adminUserNickname(chatRoomEntity.getAdmin().getUser().getNickname())
+                    .totalParticipantCount((int) totalParticipantCount)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
     public void removeChatRoom(Long chatRoomNo) {
 
         checkUserIsAdminOfChatRoom(userService.getCurrentUserNo(), chatRoomNo);
@@ -55,6 +90,7 @@ public class ChatRoomService {
         chatRoomRepository.deleteById(chatRoomNo);
     }
 
+    @Transactional
     public ChatRoomUpdateResponse modifyChatRoom(Long chatRoomNo, ChatRoomUpdateRequest chatRoomUpdateRequest) {
         ChatRoomEntity chatRoomToModify = chatRoomRepository.findById(chatRoomNo)
                 .orElseThrow(ResourceNotFoundException::new);

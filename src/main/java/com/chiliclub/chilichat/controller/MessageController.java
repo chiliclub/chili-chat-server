@@ -17,10 +17,9 @@ public class MessageController {
 
     Logger logger = LoggerFactory.getLogger(MessageController.class);
 
-    @MessageMapping("chat/message")
+    // 실제 소켓 통신 요청 -> pub/chat/message
+    @MessageMapping({"chat/message"})
     public void sendMessage(MessageRequest messageRequest) {
-
         messageService.send(messageRequest);
-
     }
 }
